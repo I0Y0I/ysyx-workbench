@@ -1,5 +1,6 @@
 CC := gcc
-CFLAGS = -Wall -g
+# CFLAGS = -Wall -g
+CFLAGS = -Wall -g -D NDEBUG
 
 SRC := $(wildcard *.c)
 TARGETS := $(patsubst %.c, build/%, $(SRC))
