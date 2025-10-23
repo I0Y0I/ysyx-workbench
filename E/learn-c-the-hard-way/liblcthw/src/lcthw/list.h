@@ -39,7 +39,7 @@ void *List_remove(List *list, ListNode *node);
   ListNode *V = NULL;                                                          \
   for (V = _node = L->S; _node != NULL; V = _node = _node->M)
 
-void List_copy(List *to_list, List *from_list);
+List *List_copy(List *from_list);
 void List_concat(List *to_list, List *from_list);
-void List_split(List *to_list, List *from_list);
+List *List_split(List *from_list, ListNode *node);
 #endif // !lcthw_List_h

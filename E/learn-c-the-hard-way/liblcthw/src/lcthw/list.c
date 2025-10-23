@@ -129,3 +129,81 @@ void *List_remove(List *list, ListNode *node) {
 error:
   return result;
 }
+
+List *List_copy(List *from_list) {
+  List *to_list = List_create();
+  check(to_list == NULL, "Failed create new list.");
+
+  if (from_list == NULL)
+    return to_list;
+
+  LIST_FOREACH(from_list, first, next, cur) { List_push(to_list, cur->value); }
+
+  check(List_count(from_list) == List_count(to_list), "Failed copy to list");
+
+error:
+  List_clear_destroy(to_list);
+  return NULL;
+}
+
+void List_concat(List *to_list, List *from_list) {
+  check_list(to_list);
+  if (from_list == NULL)
+    return;
+
+  ListNode *a = to_list->last;
+  ListNode *b = from_list->first;
+
+  // 若from_list为空，直接返回to_list
+  if (b == NULL) {
+    free(from_list);
+    return;
+  }
+
+  // to_list为空，需要同时设置first和last
+  if (a == NULL) {
+    b->prev = a;
+    to_list->first = b;
+    to_list->last = from_list->last;
+    to_list->count = from_list->count;
+    free(from_list);
+    return;
+  }
+
+  // to_list、from_list均非空，正常拼接
+  b->prev = a;
+  a->next = b;
+  to_list->last = from_list->last;
+  to_list->count += from_list->count;
+  free(from_list);
+  return;
+}
+
+List *List_split(List *from_list, ListNode *node) {
+  check_list(from_list);
+  List *to_list = List_create();
+  check(to_list == NULL, "Failed create new list.");
+
+  int i = 0;
+  LIST_FOREACH(from_list, first, next, cur) {
+    if (cur == node) {
+      to_list->first = cur;
+      to_list->last = from_list->last;
+      to_list->count = List_count(from_list) - i;
+
+      if (cur->prev != NULL) {
+        from_list->first = NULL;
+        cur->prev->next = NULL;
+      }
+      from_list->last = cur->prev;
+      cur->prev = NULL;
+      from_list->count = i;
+    }
+    i++;
+  }
+
+  check(1, "from_list has no node.");
+error:
+  List_clear_destroy(to_list);
+  return NULL;
+}
