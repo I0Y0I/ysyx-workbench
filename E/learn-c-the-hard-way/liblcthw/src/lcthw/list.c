@@ -9,8 +9,9 @@ List *List_create() { return calloc(1, sizeof(List)); }
 void check_list(List *list) {
   check(list != NULL, "list must not be NULL.");
   check(list->count >= 0, "list's count is less than 0.");
-  check(list->count > 0 && list->first == NULL,
+  check(list->first != NULL || list->count == 0,
         "list's first is NULL while count is not 0.");
+  return;
 error:
   exit(1);
 }
@@ -132,7 +133,7 @@ error:
 
 List *List_copy(List *from_list) {
   List *to_list = List_create();
-  check(to_list == NULL, "Failed create new list.");
+  check(to_list != NULL, "Failed create new list.");
 
   if (from_list == NULL)
     return to_list;
@@ -140,6 +141,8 @@ List *List_copy(List *from_list) {
   LIST_FOREACH(from_list, first, next, cur) { List_push(to_list, cur->value); }
 
   check(List_count(from_list) == List_count(to_list), "Failed copy to list");
+
+  return to_list;
 
 error:
   List_clear_destroy(to_list);
@@ -182,7 +185,7 @@ void List_concat(List *to_list, List *from_list) {
 List *List_split(List *from_list, ListNode *node) {
   check_list(from_list);
   List *to_list = List_create();
-  check(to_list == NULL, "Failed create new list.");
+  check(to_list != NULL, "Failed create new list.");
 
   int i = 0;
   LIST_FOREACH(from_list, first, next, cur) {
@@ -191,13 +194,13 @@ List *List_split(List *from_list, ListNode *node) {
       to_list->last = from_list->last;
       to_list->count = List_count(from_list) - i;
 
-      if (cur->prev != NULL) {
+      if (cur->prev == NULL) {
         from_list->first = NULL;
-        cur->prev->next = NULL;
       }
       from_list->last = cur->prev;
       cur->prev = NULL;
       from_list->count = i;
+      return to_list;
     }
     i++;
   }

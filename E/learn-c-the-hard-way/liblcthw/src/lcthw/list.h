@@ -39,7 +39,12 @@ void *List_remove(List *list, ListNode *node);
   ListNode *V = NULL;                                                          \
   for (V = _node = L->S; _node != NULL; V = _node = _node->M)
 
+// Return ptr of copied list from from_list
 List *List_copy(List *from_list);
+// Concat from_list to to_list, and delete from_list
+// if from_list is NULL, do nothing.
 void List_concat(List *to_list, List *from_list);
+// Split from_list at node, return new list.
+// if node is not in from_list, return NULL.
 List *List_split(List *from_list, ListNode *node);
 #endif // !lcthw_List_h
