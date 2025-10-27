@@ -73,8 +73,6 @@ List *List_merge_sort(List *list, List_compare cmp) {
   return list;
 }
 
-int min(int a, int b) { return a < b ? a : b; }
-
 List *List_merge_sort_iter(List *list, List_compare cmp) {
   List *prev_list, *next_list, *remain_list;
   int len = List_count(list);
