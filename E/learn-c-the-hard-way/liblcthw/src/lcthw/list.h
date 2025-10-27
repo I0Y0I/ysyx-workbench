@@ -44,7 +44,15 @@ List *List_copy(List *from_list);
 // Concat from_list to to_list, and delete from_list
 // if from_list is NULL, do nothing.
 void List_concat(List *to_list, List *from_list);
-// Split from_list at node, return new list.
-// if node is not in from_list, return NULL.
+// Split from_list at node, return new list, first of new list is node.
+// if node is not in from_list or node is NULL, return NULL.
 List *List_split(List *from_list, ListNode *node);
+
+// Return next ith Node of n.
+ListNode *List_next(ListNode *n, int i);
+// Return list[i](Node)
+ListNode *List_get(List *list, int i);
+
+// Add node to tail of list.
+void List_add_node(List *list, ListNode *node);
 #endif // !lcthw_List_h

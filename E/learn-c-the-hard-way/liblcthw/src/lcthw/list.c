@@ -3,6 +3,7 @@
 #include <lcthw/dbg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 List *List_create() { return calloc(1, sizeof(List)); }
 
@@ -18,13 +19,13 @@ error:
 
 void List_destroy(List *list) {
   check_list(list);
-  LIST_FOREACH(list, first, next, cur) {
-    if (cur->prev) {
-      free(cur->prev);
-    }
+  ListNode *cur, *next_cur;
+
+  for (cur = list->first; cur != NULL; cur = next_cur) {
+    next_cur = cur->next;
+    free(cur);
   }
 
-  free(list->last);
   free(list);
 }
 
@@ -73,30 +74,12 @@ void *List_pop(List *list) {
   return node != NULL ? List_remove(list, node) : NULL;
 }
 
-void List_unshift(List *list, void *value) {
-  check_list(list);
-  ListNode *node = calloc(1, sizeof(ListNode));
-  check_mem(node);
-
-  node->value = value;
-
-  if (list->first == NULL) {
-    list->first = node;
-    list->last = node;
-  } else {
-    list->first->prev = node;
-    node->next = list->first;
-    list->first = node;
-  }
-
-  list->count++;
-error:
-  return;
-}
+void List_unshift(List *list, void *value) { return List_push(list, value); }
 
 void *List_shift(List *list) {
   check_list(list);
-  return List_pop(list);
+  ListNode *node = list->first;
+  return node != NULL ? List_remove(list, node) : NULL;
 }
 
 void *List_remove(List *list, ListNode *node) {
@@ -183,6 +166,9 @@ void List_concat(List *to_list, List *from_list) {
 }
 
 List *List_split(List *from_list, ListNode *node) {
+  if (node == NULL) {
+    return NULL;
+  }
   check_list(from_list);
   List *to_list = List_create();
   check(to_list != NULL, "Failed create new list.");
@@ -196,6 +182,8 @@ List *List_split(List *from_list, ListNode *node) {
 
       if (cur->prev == NULL) {
         from_list->first = NULL;
+      } else {
+        cur->prev->next = NULL;
       }
       from_list->last = cur->prev;
       cur->prev = NULL;
@@ -205,8 +193,32 @@ List *List_split(List *from_list, ListNode *node) {
     i++;
   }
 
-  check(1, "from_list has no node.");
 error:
   List_clear_destroy(to_list);
   return NULL;
+}
+
+ListNode *List_next(ListNode *n, int i) {
+  while (i--) {
+    if (n == NULL)
+      return NULL;
+    n = n->next;
+  }
+  return n;
+}
+
+// get list[n]
+ListNode *List_get(List *list, int i) { return List_next(list->first, i); }
+
+void List_add_node(List *list, ListNode *node) {
+  list->count++;
+  if (list->first == NULL) {
+    list->first = node;
+    list->last = node;
+  } else {
+    node->prev = list->last;
+    node->next = NULL;
+    list->last->next = node;
+    list->last = node;
+  }
 }
