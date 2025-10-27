@@ -61,14 +61,30 @@ char *test_bubble_sort() {
   return NULL;
 }
 
-char *test_merge_sort() {
+char *test_merge_sort_recu() {
   List *words = create_words();
 
   // should work on a list that needs sorting
-  List *res = List_merge_sort(words, (List_compare)strcmp);
+  List *res = List_merge_sort_recu(words, (List_compare)strcmp);
   mu_assert(is_sorted(res), "Words are not sorted after merge sort.");
 
-  List *res2 = List_merge_sort(res, (List_compare)strcmp);
+  List *res2 = List_merge_sort_recu(res, (List_compare)strcmp);
+  mu_assert(is_sorted(res), "Should still be sorted after merge sort.");
+  List_destroy(res2);
+  List_destroy(res);
+
+  List_destroy(words);
+  return NULL;
+}
+
+char *test_merge_sort_iter() {
+  List *words = create_words();
+
+  // should work on a list that needs sorting
+  List *res = List_merge_sort_iter(words, (List_compare)strcmp);
+  mu_assert(is_sorted(res), "Words are not sorted after merge sort.");
+
+  List *res2 = List_merge_sort_iter(res, (List_compare)strcmp);
   mu_assert(is_sorted(res), "Should still be sorted after merge sort.");
   List_destroy(res2);
   List_destroy(res);
@@ -112,9 +128,17 @@ char *tb_sort() {
 
     list = create_nums(i);
     start_time = clock();
-    List_merge_sort(list, (List_compare)int_cmp);
+    List_merge_sort_recu(list, (List_compare)int_cmp);
     end_time = clock();
     log_info("merge sort %d items used %f s\n", i,
+             (double)(end_time - start_time) / CLOCKS_PER_SEC);
+    List_destroy(list);
+
+    list = create_nums(i);
+    start_time = clock();
+    List_merge_sort_iter(list, (List_compare)int_cmp);
+    end_time = clock();
+    log_info("merge iter sort %d items used %f s\n", i,
              (double)(end_time - start_time) / CLOCKS_PER_SEC);
     List_destroy(list);
   }
@@ -125,9 +149,10 @@ char *tb_sort() {
 char *all_tests() {
   mu_suite_start();
 
-  // mu_run_test(test_bubble_sort);
-  mu_run_test(test_merge_sort);
-  // mu_run_test(tb_sort);
+  mu_run_test(test_bubble_sort);
+  mu_run_test(test_merge_sort_recu);
+  mu_run_test(test_merge_sort_iter);
+  mu_run_test(tb_sort);
 
   return NULL;
 }

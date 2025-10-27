@@ -1,9 +1,6 @@
 #include "lcthw/list_algos.h"
-#include "lcthw/dbg.h"
 #include "lcthw/list.h"
 #include <stdlib.h>
-#include <string.h>
-#include <time.h>
 void List_swap(ListNode *a, ListNode *b) {
   void *buf = a->value;
   a->value = b->value;
@@ -73,7 +70,16 @@ List *List_merge_sort(List *list, List_compare cmp) {
   return list;
 }
 
+List *List_merge_sort_recu(List *list, List_compare cmp) {
+  list = List_copy(list);
+  List *sorted_list = List_merge_sort(list, cmp);
+  return sorted_list;
+}
+
 List *List_merge_sort_iter(List *list, List_compare cmp) {
+  if (List_count(list) < 2)
+    return list;
+  list = List_copy(list);
   List *prev_list, *next_list, *remain_list;
   int len = List_count(list);
   int seg;
@@ -84,7 +90,8 @@ List *List_merge_sort_iter(List *list, List_compare cmp) {
       prev_list = remain_list;
       next_list = List_split(remain_list, List_get(remain_list, seg));
       remain_list = List_split(prev_list, List_get(prev_list, seg));
+      merge(list, prev_list, next_list, cmp);
     }
   }
-  return NULL;
+  return list;
 }
