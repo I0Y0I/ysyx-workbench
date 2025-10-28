@@ -17,6 +17,16 @@ typedef struct List {
   ListNode *last;
 } List;
 
+#define check_list(A)                                                          \
+  do {                                                                         \
+    check((A) != NULL, "list must not be NULL.");                              \
+    check((A)->count >= 0, "list's count is less than 0.");                    \
+    check((A)->first != NULL || (A)->count == 0,                               \
+          "list's first is NULL while count is not 0.");                       \
+    check((A)->last != NULL || (A)->count == 0,                                \
+          "list's last is NULL while count is not 0.");                        \
+  } while (0)
+
 List *List_create();
 void List_destroy(List *list);
 void List_clear(List *list);
@@ -25,6 +35,11 @@ void List_clear_destroy(List *list);
 #define List_count(A) ((A)->count)
 #define List_first(A) ((A)->first != NULL ? (A)->first->value : NULL)
 #define List_last(A) ((A)->last != NULL ? (A)->last->value : NULL)
+#define List_not_empty(A) ((A)->count)
+#define List_empty(A) (!List_not_empty(A))
+
+void List_push_node(List *list, ListNode *node);
+ListNode *List_shift_node(List *list);
 
 void List_push(List *list, void *value);
 void *List_pop(List *list);
@@ -40,12 +55,13 @@ void *List_remove(List *list, ListNode *node);
   for (V = _node = L->S; _node != NULL; V = _node = _node->M)
 
 // Return ptr of copied list from from_list
+// will create a new list!
 List *List_copy(List *from_list);
-// Concat from_list to to_list, and delete from_list
-// if from_list is NULL, do nothing.
+// Concat from_list to to_list
 void List_concat(List *to_list, List *from_list);
 // Split from_list at node, return new list, first of new list is node.
-// if node is not in from_list or node is NULL, return NULL.
+// if node is not in from_list or node is NULL, return an empty list.
+// will create a new list!
 List *List_split(List *from_list, ListNode *node);
 
 // Return next ith Node of n.
@@ -53,6 +69,4 @@ ListNode *List_next(ListNode *n, int i);
 // Return list[i](Node)
 ListNode *List_get(List *list, int i);
 
-// Add node to tail of list.
-void List_add_node(List *list, ListNode *node);
 #endif // !lcthw_List_h

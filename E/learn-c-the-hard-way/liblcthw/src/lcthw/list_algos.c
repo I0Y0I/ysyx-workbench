@@ -32,40 +32,42 @@ int List_bubble_sort(List *list, List_compare cmp) {
 
 // merge prev_list and next_list into list
 void merge(List *list, List *prev_list, List *next_list, List_compare cmp) {
-  ListNode *a = prev_list->first;
-  ListNode *b = next_list->first;
-  while (a != NULL || b != NULL) {
+  while (List_not_empty(prev_list) || List_not_empty(next_list)) {
     ListNode *n = NULL;
-    if (a == NULL) {
-      n = b;
-      b = b->next;
-    } else if (b == NULL) {
-      n = a;
-      a = a->next;
-    } else if (cmp(a->value, b->value) > 0) {
-      n = b;
-      b = b->next;
+    if (List_empty(prev_list)) {
+      n = List_shift_node(next_list);
+    } else if (List_empty(next_list)) {
+      n = List_shift_node(prev_list);
+    } else if (cmp(prev_list->first->value, next_list->first->value) > 0) {
+      n = List_shift_node(next_list);
     } else {
-      n = a;
-      a = a->next;
+      n = List_shift_node(prev_list);
     }
-    List_add_node(list, n);
+    List_push_node(list, n);
   }
-  free(prev_list);
-  free(next_list);
+  List_destroy(prev_list);
+  List_destroy(next_list);
 }
 
 List *List_merge_sort(List *list, List_compare cmp) {
   if (List_count(list) < 2)
     return list;
 
-  List *prev_list = list;
-  List *next_list = List_split(list, List_get(list, List_count(list) >> 1));
+  // create two new list
+  List *prev_list = List_split(list, list->first);
+  List *next_list =
+      List_split(prev_list, List_get(prev_list, List_count(prev_list) >> 1));
 
+  // 1. sorted_list = list, list will be destroied in merge.
+  // 2. sorted_list != list, should destroy list manually.
   List *sort_prev_list = List_merge_sort(prev_list, cmp);
   List *sort_next_list = List_merge_sort(next_list, cmp);
 
-  list = List_create();
+  if (sort_prev_list != prev_list)
+    List_destroy(prev_list);
+  if (sort_next_list != next_list)
+    List_destroy(next_list);
+
   merge(list, sort_prev_list, sort_next_list, cmp);
   return list;
 }
@@ -77,21 +79,25 @@ List *List_merge_sort_recu(List *list, List_compare cmp) {
 }
 
 List *List_merge_sort_iter(List *list, List_compare cmp) {
+  // new list will be returned. Don't need to be destroid.
+  list = List_copy(list);
   if (List_count(list) < 2)
     return list;
-  list = List_copy(list);
   List *prev_list, *next_list, *remain_list;
   int len = List_count(list);
   int seg;
   for (seg = 1; seg < len; seg <<= 1) {
     remain_list = list;
     list = List_create();
-    while (remain_list) {
+    while (List_count(remain_list)) {
+      // create 2 lists, prev_list and next_list will be destroid in merge.
+      // remain_list need to be destroid manually.
       prev_list = remain_list;
       next_list = List_split(remain_list, List_get(remain_list, seg));
       remain_list = List_split(prev_list, List_get(prev_list, seg));
       merge(list, prev_list, next_list, cmp);
     }
+    List_destroy(remain_list);
   }
   return list;
 }

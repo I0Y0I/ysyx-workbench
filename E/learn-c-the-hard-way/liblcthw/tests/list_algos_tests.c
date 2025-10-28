@@ -9,7 +9,7 @@
 
 char *values[] = {"XXXX", "1234", "abcd", "xjvef", "NDSS"};
 
-#define N 10
+#define N 10000
 int num_values[N];
 #define NUM_VALUES 5
 
@@ -115,7 +115,7 @@ List *create_nums(int n) {
 char *tb_sort() {
   init_random_num();
   int i;
-  List *list;
+  List *list, *sorted_list;
   time_t start_time, end_time;
   for (i = 10; i <= N; i *= 2) {
     list = create_nums(i);
@@ -128,19 +128,21 @@ char *tb_sort() {
 
     list = create_nums(i);
     start_time = clock();
-    List_merge_sort_recu(list, (List_compare)int_cmp);
+    sorted_list = List_merge_sort_recu(list, (List_compare)int_cmp);
     end_time = clock();
     log_info("merge sort %d items used %f s\n", i,
              (double)(end_time - start_time) / CLOCKS_PER_SEC);
     List_destroy(list);
+    List_destroy(sorted_list);
 
     list = create_nums(i);
     start_time = clock();
-    List_merge_sort_iter(list, (List_compare)int_cmp);
+    sorted_list = List_merge_sort_iter(list, (List_compare)int_cmp);
     end_time = clock();
     log_info("merge iter sort %d items used %f s\n", i,
              (double)(end_time - start_time) / CLOCKS_PER_SEC);
     List_destroy(list);
+    List_destroy(sorted_list);
   }
 
   return NULL;

@@ -25,6 +25,32 @@ char *test_create_destroy() {
   return NULL;
 }
 
+char *test_push_shift_node() {
+  List *list1 = create_and_push();
+  List *list2 = List_create();
+
+  List_push_node(list2, List_shift_node(list1));
+  List_push_node(list2, List_shift_node(list1));
+  List_push_node(list2, List_shift_node(list1));
+  List_push_node(list2, List_shift_node(list1));
+
+  mu_assert(List_count(list1) == 0, "Wrong count after shift 4 nodes.");
+  mu_assert(List_count(list2) == 4, "Wrong count after push 4 nodes.");
+
+  char *val = List_pop(list2);
+  mu_assert(val == test4, "Wrong value on pop.");
+  val = List_pop(list2);
+  mu_assert(val == test3, "Wrong value on pop.");
+  val = List_pop(list2);
+  mu_assert(val == test2, "Wrong value on pop.");
+  val = List_pop(list2);
+  mu_assert(val == test1, "Wrong value on pop.");
+
+  List_destroy(list1);
+  List_destroy(list2);
+  return NULL;
+}
+
 char *test_push_pop() {
   List *list = List_create();
 
@@ -148,7 +174,8 @@ char *test_concat() {
   List_push(list2, test4);
 
   List_concat(list1, list2);
-  mu_assert(List_count(list1) == 4, "Wrong count after concat.");
+  mu_assert(List_count(list1) == 4, "Wrong count of list1 after concat.");
+  mu_assert(List_count(list2) == 0, "Wrong count of list2 after concat.");
 
   char *val = List_pop(list1);
   mu_assert(val == test4, "Wrong value after pop.");
@@ -160,8 +187,7 @@ char *test_concat() {
   mu_assert(val == test1, "Wrong value after pop.");
 
   List_destroy(list1);
-  // list2 should be destroied by List_concat.
-  // List_destroy(list2);
+  List_destroy(list2);
   return NULL;
 }
 
@@ -201,32 +227,12 @@ char *test_next() {
 char *test_get() {
   List *list = create_and_push();
 
-  // mu_assert(List_get(list, 0)->value == test1, "list[0] should be test1.");
-  // mu_assert(List_get(list, 2)->value == test3, "list[2] should be test3.");
-  // mu_assert(List_get(list, 4)->value == NULL, "list[4] should be NULL.");
+  mu_assert(List_get(list, 0)->value == test1, "list[0] should be test1.");
+  mu_assert(List_get(list, 2)->value == test3, "list[2] should be test3.");
+  mu_assert(List_get(list, 4) == NULL, "list[4] should be NULL.");
 
   List_destroy(list);
 
-  return NULL;
-}
-
-char *test_add_node() {
-  ListNode *n1 = malloc(sizeof(ListNode));
-  n1->value = test1;
-
-  ListNode *n2 = malloc(sizeof(ListNode));
-  n2->value = test2;
-
-  List *list = List_create();
-  List_add_node(list, n1);
-  mu_assert(List_count(list) == 1, "Wrong count after add 1 node.");
-  List_add_node(list, n2);
-  mu_assert(List_count(list) == 2, "Wrong count after add 2 nodes.");
-
-  mu_assert(List_first(list) == test1, "Wrong list[0] after add 1 node.");
-  mu_assert(List_last(list) == test2, "Wrong list[1] after add 1 node.");
-
-  List_destroy(list);
   return NULL;
 }
 
@@ -235,13 +241,13 @@ char *all_tests() {
   mu_run_test(test_create_destroy);
   mu_run_test(test_push_pop);
   mu_run_test(test_shift_unshift);
+  mu_run_test(test_push_shift_node);
   mu_run_test(test_remove);
   mu_run_test(test_copy);
   mu_run_test(test_concat);
   mu_run_test(test_split);
   mu_run_test(test_next);
   mu_run_test(test_get);
-  mu_run_test(test_add_node);
   return NULL;
 }
 
