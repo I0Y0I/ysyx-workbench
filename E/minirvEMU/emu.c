@@ -208,7 +208,7 @@ void show_display() {
 
 int main() {
   reset();
-  if (!load("/home/ioyoi/Documents/code/ysyx/E4/minirvEMU/vga.bin"))
+  if (!load("vga.bin"))
     return -1;
   // mem.bin halt at 0x1220
   // M[0x1220] = 0xFF;

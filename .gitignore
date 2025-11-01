@@ -231,3 +231,4 @@ pyrightconfig.json
 # For bear compile_commands.json
 compile_commands.json
 /fceux-am
+/am-kernels
