@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif /* ifndef _GNU_SOURCE */
+=======
+#define _GNU_SOURCE
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 #include <search.h>
 #include "platform.h"
 
@@ -12,7 +16,11 @@ typedef struct PageMap {
   struct PageMap *next;
   int prot;
   int is_mapped;
+<<<<<<< HEAD
   char key[32]; // used for hsearch_r()
+=======
+  char key[32];  // used for hsearch_r()
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 } PageMap;
 
 typedef struct VMHead {
@@ -21,15 +29,26 @@ typedef struct VMHead {
   int nr_page;
 } VMHead;
 
+<<<<<<< HEAD
 #define list_foreach(p, head)                                                  \
+=======
+#define list_foreach(p, head) \
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
   for (p = (PageMap *)(head); p != NULL; p = p->next)
 
 extern int __am_pgsize;
 static int vme_enable = 0;
+<<<<<<< HEAD
 static void *(*pgalloc)(int) = NULL;
 static void (*pgfree)(void *) = NULL;
 
 bool vme_init(void *(*pgalloc_f)(int), void (*pgfree_f)(void *)) {
+=======
+static void* (*pgalloc)(int) = NULL;
+static void (*pgfree)(void *) = NULL;
+
+bool vme_init(void* (*pgalloc_f)(int), void (*pgfree_f)(void*)) {
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
   pgalloc = pgalloc_f;
   pgfree = pgfree_f;
   vme_enable = 1;
@@ -50,6 +69,7 @@ void protect(AddrSpace *as) {
   as->area = USER_SPACE;
 }
 
+<<<<<<< HEAD
 void unprotect(AddrSpace *as) {}
 
 void __am_switch(Context *c) {
@@ -60,6 +80,17 @@ void __am_switch(Context *c) {
   VMHead *now_head = thiscpu->vm_head;
   if (head == now_head)
     goto end;
+=======
+void unprotect(AddrSpace *as) {
+}
+
+void __am_switch(Context *c) {
+  if (!vme_enable) return;
+
+  VMHead *head = c->vm_head;
+  VMHead *now_head = thiscpu->vm_head;
+  if (head == now_head) goto end;
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 
   PageMap *pp;
   if (now_head != NULL) {
@@ -95,7 +126,11 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   assert(vm_head != NULL);
   char buf[32];
   snprintf(buf, 32, "%x", va);
+<<<<<<< HEAD
   ENTRY item = {.key = buf};
+=======
+  ENTRY item = { .key = buf };
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
   ENTRY *item_find;
   hsearch_r(item, FIND, &item_find, &vm_head->hash);
   if (item_find == NULL) {
@@ -105,7 +140,11 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
     item.data = pp;
     int ret = hsearch_r(item, ENTER, &item_find, &vm_head->hash);
     assert(ret != 0);
+<<<<<<< HEAD
     vm_head->nr_page++;
+=======
+    vm_head->nr_page ++;
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
   } else {
     pp = item_find->data;
   }
@@ -123,8 +162,13 @@ void map(AddrSpace *as, void *va, void *pa, int prot) {
   }
 }
 
+<<<<<<< HEAD
 Context *ucontext(AddrSpace *as, Area kstack, void *entry) {
   Context *c = (Context *)kstack.end - 1;
+=======
+Context* ucontext(AddrSpace *as, Area kstack, void *entry) {
+  Context *c = (Context*)kstack.end - 1;
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 
   __am_get_example_uc(c);
   AM_REG_PC(&c->uc) = (uintptr_t)entry;

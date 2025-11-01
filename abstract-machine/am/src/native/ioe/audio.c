@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif /* ifndef _GNU_SOURCE */
+=======
+#define _GNU_SOURCE
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 #include <fcntl.h>
 #include <unistd.h>
 #include <klib.h>
@@ -19,6 +23,7 @@ void __am_audio_init() {
 
 static void audio_play(void *userdata, uint8_t *stream, int len) {
   int nread = len;
+<<<<<<< HEAD
   if (count < len)
     nread = count;
   int b = 0;
@@ -26,6 +31,13 @@ static void audio_play(void *userdata, uint8_t *stream, int len) {
     int n = read(rfd, stream, nread);
     if (n > 0)
       b += n;
+=======
+  if (count < len) nread = count;
+  int b = 0;
+  while (b < nread) {
+    int n = read(rfd, stream, nread);
+    if (n > 0) b += n;
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
   }
 
   count -= nread;
@@ -38,8 +50,12 @@ static void audio_write(uint8_t *buf, int len) {
   int nwrite = 0;
   while (nwrite < len) {
     int n = write(wfd, buf, len);
+<<<<<<< HEAD
     if (n == -1)
       n = 0;
+=======
+    if (n == -1) n = 0;
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
     count += n;
     nwrite += n;
   }
@@ -62,7 +78,13 @@ void __am_audio_ctrl(AM_AUDIO_CTRL_T *ctrl) {
   }
 }
 
+<<<<<<< HEAD
 void __am_audio_status(AM_AUDIO_STATUS_T *stat) { stat->count = count; }
+=======
+void __am_audio_status(AM_AUDIO_STATUS_T *stat) {
+  stat->count = count;
+}
+>>>>>>> e4f6c509733334a923bcd98bfb05be2229000f09
 
 void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   int len = ctl->buf.end - ctl->buf.start;
