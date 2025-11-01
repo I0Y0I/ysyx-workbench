@@ -50,6 +50,9 @@ int main(int argc, char *argv[]) {
   } else {
     printf("Use default n = 10\n");
   }
+  if (num > 15) {
+    printf("Overflow!, Use n = %d\n", num & 0xf);
+  }
   M[0] |= (num & 0xf);
   while (PC != 8) {
     inst_cycle();
